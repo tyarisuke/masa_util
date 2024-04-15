@@ -412,6 +412,47 @@ def compare_images(image1, image2):
     return score
 
 
+def crop_circle(image, center, radius):
+    """
+    Crop a circular region from an image.
+
+    Args:
+    - image (numpy.ndarray): The image from which to crop the circle.
+    - center (tuple of int): The (x, y) coordinates of the center of the circle.
+    - radius (int): The radius of the circle.
+
+    Returns:
+    - numpy.ndarray: The cropped circular image.
+
+    Raises:
+    - ValueError: If the radius is larger than the image dimensions allow.
+    """
+    if radius > min(
+        center[0],
+        center[1],
+        image.shape[1] - center[0],
+        image.shape[0] - center[1],
+    ):
+        raise ValueError(
+            "Radius is too large for the given center and image dimensions."
+        )
+
+    # Create a mask with the same dimensions as the image, initialized to zero (black)
+    mask = np.zeros(image.shape[:2], dtype=np.uint8)
+
+    # Draw a filled white circle on the mask at the specified center and radius
+    cv2.circle(mask, center, radius, (255), thickness=-1)
+
+    # Apply the mask to the image using bitwise AND
+    masked_image = cv2.bitwise_and(image, image, mask=mask)
+
+    # Create a bounding box around the circle to crop to the minimal area
+    x, y = center[0] - radius, center[1] - radius
+    cropped_image = masked_image[y : y + 2 * radius, x : x + 2 * radius]
+
+    return cropped_image
+
+
 def crop(image, x, y, width, height):
     """
     Crop an image. This function supports both color and grayscale images.
