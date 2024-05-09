@@ -1,8 +1,11 @@
 import subprocess
 import time
 
+import mss
+import numpy as np
 import pyautogui as ag
 import pygetwindow as gw
+from PIL import ImageGrab
 from pygetwindow import PyGetWindowException as GetWindowException
 
 
@@ -101,9 +104,13 @@ def get_window_size(window):
 
 
 def screenshot(window):
-    x, y = get_window_topleft(window)
-    w, h = get_window_size(window)
-    return ag.screenshot(region=(x, y, w, h))
+    with mss.mss() as sct:
+        x, y = get_window_topleft(window)
+        w, h = get_window_size(window)
+        monitor = {"top": y, "left": x, "width": w, "height": h}
+        sct_img = sct.grab(monitor)
+        img = np.array(sct_img)
+        return img
 
 
 if __name__ == "__main__":

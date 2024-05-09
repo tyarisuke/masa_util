@@ -54,7 +54,7 @@ class RotatingLogFile:
 
         # Setup log file format
         formatter = logging.Formatter(
-            "%(asctime)s - %(levelname)s - %(message)s",
+            "%(asctime)s.%(msecs)03d - %(levelname)s - %(message)s",
             datefmt="%Y/%m/%d %H:%M:%S",
         )
 
