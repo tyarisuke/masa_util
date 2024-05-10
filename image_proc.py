@@ -793,7 +793,7 @@ def convert_x_y_w_h(top_left, bottom_right):
     return x, y, w, h
 
 
-def paste_image(large_image, small_image, x_offset, y_offset):
+def paste(large_image, small_image, x_offset, y_offset):
     """
     Paste a small image onto a specified position of a large image using OpenCV.
 
@@ -826,7 +826,7 @@ def paste_image(large_image, small_image, x_offset, y_offset):
     return large_image
 
 
-def create_black_image(width, height, color=True):
+def create_black(width, height, color=True):
     """
     Create a black image of specified width and height.
 
@@ -884,6 +884,50 @@ def concatenate_vertically(image1, image2):
         raise ValueError("Widths of images do not match.")
 
     return np.vstack((image1, image2))
+
+
+def paste_center(large_image, small_image):
+    """
+    Paste a small image onto the center of a large image using OpenCV, scaling it down if necessary while maintaining aspect ratio.
+
+    Args:
+    - large_image (numpy.ndarray): The larger image on which the small image will be pasted.
+    - small_image (numpy.ndarray): The small image to paste.
+
+    Returns:
+    - numpy.ndarray: The large image with the small image pasted onto its center.
+
+    Raises:
+    - ValueError: If the small image is larger than the large image in any dimension.
+    """
+    # Get dimensions of both images
+    large_height, large_width = large_image.shape[:2]
+    small_height, small_width = small_image.shape[:2]
+
+    # Calculate scale to fit the small image within the large image
+    scale_width = large_width / small_width
+    scale_height = large_height / small_height
+    scale = min(scale_width, scale_height)
+
+    # If scaling is needed (scale < 1), resize the small image
+    if scale < 1:
+        new_width = int(small_width * scale)
+        new_height = int(small_height * scale)
+        small_image = cv2.resize(small_image, (new_width, new_height))
+    elif scale > 1:
+        # If no scaling is needed, use the small image as it is
+        new_width, new_height = small_width, small_height
+
+    # Calculate the center offset
+    y_offset = (large_height - new_height) // 2
+    x_offset = (large_width - new_width) // 2
+
+    # Paste the small image onto the large image
+    large_image[
+        y_offset : y_offset + new_height, x_offset : x_offset + new_width
+    ] = small_image
+
+    return large_image
 
 
 if __name__ == "__main__":
