@@ -325,6 +325,44 @@ def otsu_threshold(image):
     return binary_image
 
 
+def morphological_dilation(
+    image, kernel_size=(5, 5), kernel_shape=cv2.MORPH_RECT
+):
+    """
+    Apply morphological dilation to an image to expand the foreground.
+
+    Args:
+    - image (numpy.ndarray): The image on which to perform the operation.
+    - kernel_size (tuple of int, optional): The size of the kernel used for the morphological operation. Default is (5, 5).
+    - kernel_shape (int, optional): The shape of the structuring element. Options include cv2.MORPH_RECT, cv2.MORPH_ELLIPSE, and cv2.MORPH_CROSS. Default is cv2.MORPH_RECT.
+
+    Returns:
+    - numpy.ndarray: The image after applying morphological dilation.
+    """
+    kernel = cv2.getStructuringElement(kernel_shape, kernel_size)
+    dilated_image = cv2.dilate(image, kernel)
+    return dilated_image
+
+
+def morphological_erosion(
+    image, kernel_size=(5, 5), kernel_shape=cv2.MORPH_RECT
+):
+    """
+    Apply morphological erosion to an image to shrink the foreground.
+
+    Args:
+    - image (numpy.ndarray): The image on which to perform the operation.
+    - kernel_size (tuple of int, optional): The size of the kernel used for the morphological operation. Default is (5, 5).
+    - kernel_shape (int, optional): The shape of the structuring element. Options include cv2.MORPH_RECT, cv2.MORPH_ELLIPSE, and cv2.MORPH_CROSS. Default is cv2.MORPH_RECT.
+
+    Returns:
+    - numpy.ndarray: The image after applying morphological erosion.
+    """
+    kernel = cv2.getStructuringElement(kernel_shape, kernel_size)
+    eroded_image = cv2.erode(image, kernel)
+    return eroded_image
+
+
 def morphological_opening(
     image, kernel_size=(5, 5), kernel_shape=cv2.MORPH_RECT
 ):
@@ -407,19 +445,25 @@ def find_bounding_boxes_within_range(
     return valid_bounding_boxes
 
 
-def draw_bounding_boxes(image, boxes, color=(0, 255, 0), thickness=2):
+def draw_bounding_boxes(image, boxes, color=(255, 0, 0), thickness=2):
     """
-    Draw bounding boxes on an image.
+    Draw bounding boxes on an image. Supports both color and grayscale images.
 
     Args:
     - image (numpy.ndarray): The image on which to draw the bounding boxes.
     - boxes (list of tuples): A list of tuples, where each tuple contains the coordinates and size of the box (x, y, width, height).
-    - color (tuple, optional): The color of the bounding boxes in BGR format. Default is green (0, 255, 0).
-    - thickness (int, optional): The thickness of the bounding box lines. Default is 2.
+    - color (tuple, optional): The color of the bounding boxes in BGR format for color images, or grayscale value for grayscale images. Default is green (0, 255, 0) for color images.
+    - thickness (int, optional): The thickness of the bounding box's outline. If set to -1, the box will be filled. Default is 2.
 
     Returns:
     - numpy.ndarray: The image with bounding boxes drawn on it.
     """
+    # Check if the image is grayscale (2 dimensions) or color (3 dimensions)
+    if len(image.shape) == 2:  # Grayscale image
+        # Ensure the color is a single integer if the image is grayscale
+        grayscale_color = 255 if len(color) > 1 else color[0]
+        color = grayscale_color  # Update color to be the grayscale color
+
     # Make a copy of the image to draw on
     image_with_boxes = image.copy()
 
