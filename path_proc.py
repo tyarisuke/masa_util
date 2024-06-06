@@ -75,6 +75,25 @@ def pad_file_numbers(directory: str, num_digits: int):
             print(f"Renamed '{filename}' to '{new_filename}'")
 
 
+def delete(file):
+    """
+    Delete an image file from the file system.
+
+    Args:
+    - image (str): The path to the file to be deleted.
+
+    Returns:
+    - str: A message indicating whether the deletion was successful or if an error occurred.
+    """
+    # ファイルが存在するかどうかを確認
+    if os.path.exists(file):
+        # ファイルを削除
+        os.remove(file)
+        return "Image deleted successfully."
+    else:
+        return "Error: The image file does not exist."
+
+
 if __name__ == "__main__":
 
     # 使用例

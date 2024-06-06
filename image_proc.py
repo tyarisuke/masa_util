@@ -110,6 +110,51 @@ def convert_to_grayscale(image):
     return gray_image
 
 
+def convert_to_color(grayscale_image):
+    """
+    Convert a grayscale image to color by duplicating the grayscale channel.
+
+    Args:
+    - grayscale_image (numpy.ndarray): The grayscale image to convert.
+
+    Returns:
+    - numpy.ndarray: The color image.
+    """
+    color_image = cv2.cvtColor(grayscale_image, cv2.COLOR_GRAY2BGR)
+    return color_image
+
+
+def is_color_image(image):
+    """
+    Check if an image is a color image.
+
+    Args:
+    - image (numpy.ndarray): The image to check.
+
+    Returns:
+    - bool: True if the image is a color image, False otherwise.
+    """
+    if len(image.shape) == 3 and image.shape[2] == 3:
+        return True
+    else:
+        return False
+
+
+def copy_image(image):
+    """
+    Create a copy of an image.
+
+    Args:
+    - image (numpy.ndarray): The image to copy.
+
+    Returns:
+    - numpy.ndarray: A copy of the input image.
+    """
+    # numpyの配列メソッドを使用して画像をコピー
+    image_copy = image.copy()
+    return image_copy
+
+
 def show_image(
     image, window_name="Image", wait_time=0, close_window=True, scale=None
 ):
@@ -323,6 +368,44 @@ def otsu_threshold(image):
     )
 
     return binary_image
+
+
+def morphological_dilation(
+    image, kernel_size=(5, 5), kernel_shape=cv2.MORPH_RECT
+):
+    """
+    Apply morphological dilation to an image to expand the foreground.
+
+    Args:
+    - image (numpy.ndarray): The image on which to perform the operation.
+    - kernel_size (tuple of int, optional): The size of the kernel used for the morphological operation. Default is (5, 5).
+    - kernel_shape (int, optional): The shape of the structuring element. Options include cv2.MORPH_RECT, cv2.MORPH_ELLIPSE, and cv2.MORPH_CROSS. Default is cv2.MORPH_RECT.
+
+    Returns:
+    - numpy.ndarray: The image after applying morphological dilation.
+    """
+    kernel = cv2.getStructuringElement(kernel_shape, kernel_size)
+    dilated_image = cv2.dilate(image, kernel)
+    return dilated_image
+
+
+def morphological_erosion(
+    image, kernel_size=(5, 5), kernel_shape=cv2.MORPH_RECT
+):
+    """
+    Apply morphological erosion to an image to shrink the foreground.
+
+    Args:
+    - image (numpy.ndarray): The image on which to perform the operation.
+    - kernel_size (tuple of int, optional): The size of the kernel used for the morphological operation. Default is (5, 5).
+    - kernel_shape (int, optional): The shape of the structuring element. Options include cv2.MORPH_RECT, cv2.MORPH_ELLIPSE, and cv2.MORPH_CROSS. Default is cv2.MORPH_RECT.
+
+    Returns:
+    - numpy.ndarray: The image after applying morphological erosion.
+    """
+    kernel = cv2.getStructuringElement(kernel_shape, kernel_size)
+    eroded_image = cv2.erode(image, kernel)
+    return eroded_image
 
 
 def morphological_opening(
